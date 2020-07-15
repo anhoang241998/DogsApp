@@ -29,8 +29,10 @@ public class ListViewModel extends AndroidViewModel {
         dogsList.add(dog1);
         dogsList.add(dog2);
         dogsList.add(dog3);
+
         dogs.setValue(dogsList);
         dogLoadError.setValue(false);
         loading.setValue(false);
+
     }
 }
