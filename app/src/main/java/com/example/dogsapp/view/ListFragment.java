@@ -9,16 +9,17 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.dogsapp.R;
 import com.example.dogsapp.adapters.DogsListAdapter;
-import com.example.dogsapp.model.DogBreed;
 import com.example.dogsapp.viewmodel.ListViewModel;
 
 import java.util.ArrayList;
@@ -38,7 +39,6 @@ public class ListFragment extends Fragment {
     ProgressBar loadingView;
     @BindView(R.id.refreshLayout)
     SwipeRefreshLayout refreshLayout;
-
     // function
     private View v;
     private ListViewModel mViewModel;
@@ -60,6 +60,8 @@ public class ListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        onGoToDetails();
+
         mViewModel = ViewModelProviders.of(this).get(ListViewModel.class);
         mViewModel.refresh();
 
@@ -69,6 +71,8 @@ public class ListFragment extends Fragment {
         dogsList.setAdapter(mDogsListAdapter);
 
         observeViewModel();
+
+
     }
 
     private void observeViewModel() {
@@ -85,15 +89,20 @@ public class ListFragment extends Fragment {
             }
         });
 
-        mViewModel.loading.observe(this, isLoading ->{
-            if (isLoading !=null && isLoading instanceof Boolean){
+        mViewModel.loading.observe(this, isLoading -> {
+            if (isLoading != null && isLoading instanceof Boolean) {
                 loadingView.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-                if(isLoading){
+                if (isLoading) {
                     listError.setVisibility(View.GONE);
                     dogsList.setVisibility(View.GONE);
                 }
             }
         });
+    }
+
+    private void onGoToDetails() {
+        ListFragmentDirections.ActionDetail action = ListFragmentDirections.actionDetail();
+        Navigation.findNavController(v).navigate(action);
     }
 
 }
