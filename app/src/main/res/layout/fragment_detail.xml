@@ -1,33 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.DetailFragment">
+    tools:context=".view.DetailFragment"
+    tools:ignore="ContentDescription">
+
+    <ImageView
+        android:src="@mipmap/ic_dog"
+        android:id="@+id/dogImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:minHeight="200dp"
+        android:scaleType="fitCenter" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/dogName"
+        style="@style/Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="DetailFragement"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_below="@id/dogImage"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="4dp"
+        android:text="Dog name" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+    <TextView
+        android:id="@+id/dogPurpose"
+        style="@style/Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:src="@drawable/ic_list"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.859"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.899" />
+        android:layout_below="@id/dogName"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="4dp"
+        android:text="Dog purpose" />
+
+    <TextView
+        android:id="@+id/dogTemperament"
+        style="@style/Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dogPurpose"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="4dp"
+        android:text="Dog temperament" />
+
+    <TextView
+        android:id="@+id/dogLifespan"
+        style="@style/Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dogTemperament"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="4dp"
+        android:text="Dog lifespan" />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>
