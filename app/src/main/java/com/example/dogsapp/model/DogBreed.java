@@ -1,17 +1,24 @@
 package com.example.dogsapp.model;
 
-public class DogBreed {
-    public String breedID;
-    public String dogBreed;
-    public String lifeSpan;
-    public String breedGroup;
-    public String bredFor;
-    public String temperament;
-    public String imageUrl;
-    public int uui;
+import com.google.gson.annotations.SerializedName;
 
-    public DogBreed() {
-    }
+public class DogBreed {
+    @SerializedName("id")
+    public String breedID;
+    @SerializedName("name")
+    public String dogBreed;
+    @SerializedName("life_span")
+    public String lifeSpan;
+    @SerializedName("breed_group")
+    public String breedGroup;
+    @SerializedName("bred_for")
+    public String bredFor;
+    @SerializedName("temperament")
+    public String temperament;
+    @SerializedName("url")
+    public String imageUrl;
+
+    public int uuid;
 
     public DogBreed(String breedID, String dogBreed, String lifeSpan, String breedGroup, String bredFor, String temperament, String imageUrl) {
         this.breedID = breedID;

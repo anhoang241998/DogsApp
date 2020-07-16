@@ -60,8 +60,6 @@ public class ListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        onGoToDetails();
-
         mViewModel = ViewModelProviders.of(this).get(ListViewModel.class);
         mViewModel.refresh();
 
@@ -99,10 +97,4 @@ public class ListFragment extends Fragment {
             }
         });
     }
-
-    private void onGoToDetails() {
-        ListFragmentDirections.ActionDetail action = ListFragmentDirections.actionDetail();
-        Navigation.findNavController(v).navigate(action);
-    }
-
 }
