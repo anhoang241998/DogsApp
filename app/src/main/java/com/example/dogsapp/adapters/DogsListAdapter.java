@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dogsapp.R;
 import com.example.dogsapp.model.DogBreed;
+import com.example.dogsapp.util.Util;
 
 import java.util.List;
 
@@ -37,9 +38,9 @@ public class DogsListAdapter extends RecyclerView.Adapter<DogsListAdapter.DogVie
 
     @Override
     public void onBindViewHolder(@NonNull DogViewHolder holder, int position) {
-//        holder.image.setImageDrawable();
         holder.name.setText(mDogsList.get(position).dogBreed);
         holder.lifespan.setText(mDogsList.get(position).lifeSpan);
+        Util.loadImages(holder.image, mDogsList.get(position).imageUrl, Util.getProgressDrawable(holder.image.getContext()));
     }
 
     @Override
