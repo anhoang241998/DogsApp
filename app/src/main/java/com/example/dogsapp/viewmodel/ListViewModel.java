@@ -1,14 +1,19 @@
 package com.example.dogsapp.viewmodel;
 
 import android.app.Application;
+import android.os.AsyncTask;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.dogsapp.model.DogBreed;
+import com.example.dogsapp.model.DogDao;
+import com.example.dogsapp.model.DogDatabase;
 import com.example.dogsapp.model.DogsApiService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,12 +30,21 @@ public class ListViewModel extends AndroidViewModel {
     private DogsApiService mDogsApiService = new DogsApiService();
     private CompositeDisposable disposable = new CompositeDisposable();
 
+    private AsyncTask<List<DogBreed>, Void, List<DogBreed>> insertTask;
+    private AsyncTask<Void, Void, List<DogBreed>> retrieveTask;
+    
     public ListViewModel(@NonNull Application application) {
         super(application);
     }
 
     public void refresh() {
-        fetchFromRemote();
+        fetchFromDataBase();
+    }
+
+    private void fetchFromDataBase(){
+        loading.setValue(true);
+        retrieveTask = new RetrieveDogTask();
+        retrieveTask.execute();
     }
 
     private void fetchFromRemote() {
@@ -42,9 +56,9 @@ public class ListViewModel extends AndroidViewModel {
                         .subscribeWith(new DisposableSingleObserver<List<DogBreed>>() {
                             @Override
                             public void onSuccess(List<DogBreed> dogBreeds) {
-                                dogs.setValue(dogBreeds);
-                                dogLoadError.setValue(false);
-                                loading.setValue(false);
+                                insertTask = new InsertDogsTask();
+                                insertTask.execute(dogBreeds);
+                                Toast.makeText(getApplication(), "Dogs retrieved form endpoint", Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
@@ -57,9 +71,65 @@ public class ListViewModel extends AndroidViewModel {
         );
     }
 
+    private void dogsRetrieve(List<DogBreed> dogList) {
+        dogs.setValue(dogList);
+        dogLoadError.setValue(false);
+        loading.setValue(false);
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();
         disposable.clear();
+
+        if (insertTask != null) {
+            insertTask.cancel(true);
+            insertTask = null;
+        }
+
+        if (retrieveTask != null) {
+            retrieveTask.cancel(true);
+            retrieveTask = null;
+        }
+    }
+
+    private class InsertDogsTask extends AsyncTask<List<DogBreed>, Void, List<DogBreed>> {
+
+        @Override
+        protected List<DogBreed> doInBackground(List<DogBreed>... lists) {
+            List<DogBreed> list = lists[0];
+            DogDao dao = DogDatabase.getInstance(getApplication()).dogDao();
+            dao.deleteAllDogs();
+
+            ArrayList<DogBreed> newList = new ArrayList<>(list);
+            List<Long> result = dao.insertAll(newList.toArray(new DogBreed[0]));
+
+            int i = 0;
+            while (i < list.size()) {
+                list.get(i).uuid = result.get(i).intValue();
+                ++i;
+            }
+
+            return list;
+        }
+
+        @Override
+        protected void onPostExecute(List<DogBreed> dogBreeds) {
+            dogsRetrieve(dogBreeds);
+        }
+    }
+
+    private class RetrieveDogTask extends AsyncTask<Void, Void, List<DogBreed>> {
+
+        @Override
+        protected List<DogBreed> doInBackground(Void... voids) {
+            return DogDatabase.getInstance(getApplication()).dogDao().getAllDog();
+        }
+
+        @Override
+        protected void onPostExecute(List<DogBreed> dogBreeds) {
+            dogsRetrieve(dogBreeds);
+            Toast.makeText(getApplication(), "Dogs retrieved from database", Toast.LENGTH_SHORT).show();
+        }
     }
 }
