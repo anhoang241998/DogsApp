@@ -14,6 +14,7 @@ import com.example.dogsapp.model.DogDao;
 import com.example.dogsapp.model.DogDatabase;
 import com.example.dogsapp.model.DogsApiService;
 import com.example.dogsapp.repository.DatabaseRomRepository;
+import com.example.dogsapp.util.SharedPreferencesHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import io.reactivex.schedulers.Schedulers;
 public class ListViewModel extends AndroidViewModel {
 
 
-    private DatabaseRomRepository mDatabaseRomRepository;
+    //    private DatabaseRomRepository mDatabaseRomRepository;
     public MutableLiveData<List<DogBreed>> dogs = new MutableLiveData<List<DogBreed>>();
     public MutableLiveData<Boolean> dogLoadError = new MutableLiveData<Boolean>();
     public MutableLiveData<Boolean> loading = new MutableLiveData<Boolean>();
@@ -36,27 +37,39 @@ public class ListViewModel extends AndroidViewModel {
 
     private AsyncTask<List<DogBreed>, Void, List<DogBreed>> insertTask;
     private AsyncTask<Void, Void, List<DogBreed>> retrieveTask;
-    
+
+    //Cache reload time
+    private SharedPreferencesHelper prefsHelper = SharedPreferencesHelper.getInstance(getApplication());
+    private long refreshTime = 5 * 60 * 1000 * 1000 * 1000L;
+
     public ListViewModel(@NonNull Application application) {
         super(application);
-        mDatabaseRomRepository = DatabaseRomRepository.getInstance(application);
+//        mDatabaseRomRepository = DatabaseRomRepository.getInstance(application);
     }
 
     public void refresh() {
-        fetchFromDataBase();
+        long updateTime  = prefsHelper.getUpdateTime();
+        long currentTime = System.nanoTime();
+        if (updateTime != 0 && currentTime - updateTime < refreshTime) {
+            fetchFromDataBase();
+        } else {
+            fetchFromRemote();
+        }
     }
 
     @SuppressLint("CheckResult")
-    private void fetchFromDataBase(){
+    private void fetchFromDataBase() {
         loading.setValue(true);
-        mDatabaseRomRepository
-                .getAll()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dogBreeds -> {
-                    dogsRetrieve(dogBreeds);
-                    Toast.makeText(getApplication(), "Dogs retrieved from database", Toast.LENGTH_SHORT).show();
-                });
+        retrieveTask = new RetrieveDogTask();
+        retrieveTask.execute();
+//        mDatabaseRomRepository
+//                .getAll()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(dogBreeds -> {
+//                    dogsRetrieve(dogBreeds);
+//                    Toast.makeText(getApplication(), "Dogs retrieved from database", Toast.LENGTH_SHORT).show();
+//                });
     }
 
     private void fetchFromRemote() {
@@ -128,19 +141,21 @@ public class ListViewModel extends AndroidViewModel {
         @Override
         protected void onPostExecute(List<DogBreed> dogBreeds) {
             dogsRetrieve(dogBreeds);
+            prefsHelper.saveUpdateTime(System.nanoTime());
         }
     }
 
-//    private class RetrieveDogTask extends AsyncTask<Void, Void, List<DogBreed>> {
-//
-//        @Override
-//        protected List<DogBreed> doInBackground(Void... voids) {
-//            return DogDatabase.getInstance(getApplication()).dogDao().getAllDog();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(List<DogBreed> dogBreeds) {
-//
-//        }
-//    }
+    private class RetrieveDogTask extends AsyncTask<Void, Void, List<DogBreed>> {
+
+        @Override
+        protected List<DogBreed> doInBackground(Void... voids) {
+            return DogDatabase.getInstance(getApplication()).dogDao().getAllDog();
+        }
+
+        @Override
+        protected void onPostExecute(List<DogBreed> dogBreeds) {
+            dogsRetrieve(dogBreeds);
+            Toast.makeText(getApplication(), "Dogs retrieved from database", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

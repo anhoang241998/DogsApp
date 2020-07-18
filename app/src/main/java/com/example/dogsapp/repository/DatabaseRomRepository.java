@@ -14,23 +14,23 @@ public class DatabaseRomRepository {
     private DogDao mDogDao;
     private static DatabaseRomRepository mDatabaseRomRepository = null;
 
-    public DatabaseRomRepository(Context context) {
-        mDogDao = DogDatabase.getInstance(context).dogDao();
-    }
-
-    public static DatabaseRomRepository getInstance(Context context){
-        if (mDatabaseRomRepository == null){
-            mDatabaseRomRepository = new DatabaseRomRepository(context);
-        }
-        return mDatabaseRomRepository;
-    }
-
-    public List<Long> insertDatabase(DogBreed... dogBreeds ){
-        return mDogDao.insertAll(dogBreeds);
-    }
-
-    public Observable<List<DogBreed>> getAll(){
-        return  mDogDao.getAllDog();
-    }
+//    public DatabaseRomRepository(Context context) {
+//        mDogDao = DogDatabase.getInstance(context).dogDao();
+//    }
+//
+//    public static DatabaseRomRepository getInstance(Context context){
+//        if (mDatabaseRomRepository == null){
+//            mDatabaseRomRepository = new DatabaseRomRepository(context);
+//        }
+//        return mDatabaseRomRepository;
+//    }
+//
+//    public List<Long> insertDatabase(DogBreed... dogBreeds ){
+//        return mDogDao.insertAll(dogBreeds);
+//    }
+//
+//    public Observable<List<DogBreed>> getAll(){
+//        return  mDogDao.getAllDog();
+//    }
 
 }
