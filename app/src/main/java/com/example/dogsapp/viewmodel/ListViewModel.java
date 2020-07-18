@@ -1,5 +1,6 @@
 package com.example.dogsapp.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -12,6 +13,7 @@ import com.example.dogsapp.model.DogBreed;
 import com.example.dogsapp.model.DogDao;
 import com.example.dogsapp.model.DogDatabase;
 import com.example.dogsapp.model.DogsApiService;
+import com.example.dogsapp.repository.DatabaseRomRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ListViewModel extends AndroidViewModel {
 
+
+    private DatabaseRomRepository mDatabaseRomRepository;
     public MutableLiveData<List<DogBreed>> dogs = new MutableLiveData<List<DogBreed>>();
     public MutableLiveData<Boolean> dogLoadError = new MutableLiveData<Boolean>();
     public MutableLiveData<Boolean> loading = new MutableLiveData<Boolean>();
@@ -35,16 +39,24 @@ public class ListViewModel extends AndroidViewModel {
     
     public ListViewModel(@NonNull Application application) {
         super(application);
+        mDatabaseRomRepository = DatabaseRomRepository.getInstance(application);
     }
 
     public void refresh() {
         fetchFromDataBase();
     }
 
+    @SuppressLint("CheckResult")
     private void fetchFromDataBase(){
         loading.setValue(true);
-        retrieveTask = new RetrieveDogTask();
-        retrieveTask.execute();
+        mDatabaseRomRepository
+                .getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(dogBreeds -> {
+                    dogsRetrieve(dogBreeds);
+                    Toast.makeText(getApplication(), "Dogs retrieved from database", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void fetchFromRemote() {
@@ -119,17 +131,16 @@ public class ListViewModel extends AndroidViewModel {
         }
     }
 
-    private class RetrieveDogTask extends AsyncTask<Void, Void, List<DogBreed>> {
-
-        @Override
-        protected List<DogBreed> doInBackground(Void... voids) {
-            return DogDatabase.getInstance(getApplication()).dogDao().getAllDog();
-        }
-
-        @Override
-        protected void onPostExecute(List<DogBreed> dogBreeds) {
-            dogsRetrieve(dogBreeds);
-            Toast.makeText(getApplication(), "Dogs retrieved from database", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    private class RetrieveDogTask extends AsyncTask<Void, Void, List<DogBreed>> {
+//
+//        @Override
+//        protected List<DogBreed> doInBackground(Void... voids) {
+//            return DogDatabase.getInstance(getApplication()).dogDao().getAllDog();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(List<DogBreed> dogBreeds) {
+//
+//        }
+//    }
 }

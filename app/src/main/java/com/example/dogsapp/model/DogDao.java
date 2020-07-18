@@ -1,11 +1,13 @@
 package com.example.dogsapp.model;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
 import java.util.List;
+
+import io.reactivex.Observable;
+
 
 @Dao
 public interface DogDao {
@@ -13,7 +15,7 @@ public interface DogDao {
     List<Long> insertAll(DogBreed... dogs);
 
     @Query("SELECT * FROM dogbreed")
-    List<DogBreed> getAllDog();
+    Observable<List<DogBreed>> getAllDog();
 
     @Query("SELECT * FROM dogbreed WHERE uuid = :dogID")
     DogBreed getDog(int dogID);
