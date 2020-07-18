@@ -68,6 +68,14 @@ public class ListFragment extends Fragment {
         dogsList.setItemViewCacheSize(20);
         dogsList.setAdapter(mDogsListAdapter);
 
+        refreshLayout.setOnRefreshListener(() -> {
+            dogsList.setVisibility(View.GONE);
+            listError.setVisibility(View.GONE);
+            loadingView.setVisibility(View.VISIBLE);
+            mViewModel.refreshBypassCache();
+            refreshLayout.setRefreshing(false);
+        });
+
         observeViewModel();
 
 

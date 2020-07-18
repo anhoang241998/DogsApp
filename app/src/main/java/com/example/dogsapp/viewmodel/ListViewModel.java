@@ -57,6 +57,10 @@ public class ListViewModel extends AndroidViewModel {
         }
     }
 
+    public void refreshBypassCache() {
+        fetchFromRemote();
+    }
+
     @SuppressLint("CheckResult")
     private void fetchFromDataBase() {
         loading.setValue(true);
