@@ -12,9 +12,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import com.example.dogsapp.R;
 import com.example.dogsapp.model.DogBreed;
+import com.example.dogsapp.util.Util;
 import com.example.dogsapp.viewmodel.DetailViewModel;
 
 import butterknife.BindView;
@@ -56,18 +58,24 @@ public class DetailFragment extends Fragment {
         }
 
         mDetailViewModel = ViewModelProviders.of(this).get(DetailViewModel.class);
-        mDetailViewModel.fetch();
+        mDetailViewModel.fetch(mDogUuid);
 
         observeViewModel();
     }
 
     private void observeViewModel() {
         mDetailViewModel.dogsLiveData.observe(this, dogs -> {
-            if (dogs != null && dogs instanceof DogBreed){
+            if (dogs != null && dogs instanceof DogBreed) {
                 dogName.setText(dogs.dogBreed);
                 dogPurpose.setText(dogs.bredFor);
                 dogTemperament.setText(dogs.temperament);
                 dogLifespan.setText(dogs.lifeSpan);
+
+            }
+
+            if (dogs.imageUrl != null && getContext() != null) {
+                Util.loadImages(dogImage, dogs.imageUrl, new CircularProgressDrawable(getContext()));
+
             }
         });
 

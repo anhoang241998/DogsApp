@@ -24,7 +24,8 @@
         tools:layout="@layout/fragment_detail" >
         <action
             android:id="@+id/actionList"
-            app:destination="@id/listFragment" />
+            app:destination="@id/listFragment"
+            app:exitAnim="@android:anim/fade_out" />
         <argument
             android:name="dogUuid"
             app:argType="integer"
